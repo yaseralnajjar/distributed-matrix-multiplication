@@ -39,7 +39,9 @@ def test_numpy_dot():
 @test
 @timer('    Took: ', precision=9)
 def test_dot_matrix_with_splits_by_two():
-    whole_dot = dot_matrix_with_splits(x, y, number_of_splits=2)
+    dots_generator = dot_matrix_with_splits(x, y, number_of_splits=2)
+    dots = list(dots_generator)
+    whole_dot = np.concatenate(dots)
 
     actual_result = np.squeeze(np.asarray(whole_dot)).tolist()
     assert actual_result == expected_result
@@ -48,7 +50,18 @@ def test_dot_matrix_with_splits_by_two():
 @test
 @timer('    Took: ', precision=9)
 def test_dot_matrix_with_splits_by_three():
-    whole_dot = dot_matrix_with_splits(x, y, number_of_splits=3)
+    dots_generator = dot_matrix_with_splits(x, y, number_of_splits=3)
+    dots = list(dots_generator)
+    whole_dot = np.concatenate(dots)
+
+    actual_result = np.squeeze(np.asarray(whole_dot)).tolist()
+    assert actual_result == expected_result
+
+
+# @test
+@timer('    Took: ', precision=9)
+def test_dot_matrix_map_and_reduce():
+    whole_dot = dot_matrix_with_splits(x, y, number_of_splits=2)
 
     actual_result = np.squeeze(np.asarray(whole_dot)).tolist()
     assert actual_result == expected_result

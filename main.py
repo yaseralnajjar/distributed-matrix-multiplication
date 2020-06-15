@@ -21,9 +21,5 @@ def dot_matrix_with_splits(x, y, number_of_splits):
     sub_matrixes = chunks(x, number_of_splits)
 
     y_matrix = np.matrix(y)
-    dots = []
     for sub_matrix in sub_matrixes:
-        dots.append(np.matrix(sub_matrix) * y_matrix)
-
-    result = np.concatenate(dots)
-    return result
+        yield np.matrix(sub_matrix) * y_matrix
