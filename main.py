@@ -4,7 +4,7 @@ import numpy as np
 def dot_matrix_with_splits(x, y, number_of_splits):
 
     def chunks(lst, n):
-        # https://stackoverflow.com/a/312464/4565520
+        # src: https://stackoverflow.com/a/312464/4565520
         """Yield successive n-sized chunks from lst."""
         for i in range(0, len(lst), n):
             yield lst[i:i + n]
