@@ -1,6 +1,7 @@
+import os
 import numpy as np
 from timer import timer
-from main import dot_matrix_with_splits
+from main import dot_matrix_with_splits, dot_matrix_map_and_reduce
 
 
 # 3x3 matrix
@@ -58,11 +59,32 @@ def test_dot_matrix_with_splits_by_three():
     assert actual_result == expected_result
 
 
-# @test
+@test
 @timer('    Took: ', precision=9)
-def test_dot_matrix_map_and_reduce():
-    whole_dot = dot_matrix_with_splits(x, y, number_of_splits=2)
+def test_dot_matrix_map_and_reduce_by_two():
+    def recreate_dirs(folders):
+        def rmtree(directory):
+            # src: https://stackoverflow.com/a/52324968/4565520
+            for root, dirs, files in os.walk(directory, topdown=False):
+                for file in files:
+                    os.remove(os.path.join(root, file))
+                for dir in dirs:
+                    os.rmdir(os.path.join(root, dir))
+            os.rmdir(directory)
 
+        for folder in folders:
+            working_directory = os.path.dirname(os.path.realpath(__file__))
+            folder_to_recreate = os.path.join(working_directory, folder)
+            try:
+                rmtree(folder_to_recreate)
+            except Exception as e:
+                # print(e)
+                pass
+            os.mkdir(folder_to_recreate)
+
+    recreate_dirs(['host0', 'host1', 'reduced'])
+
+    whole_dot = dot_matrix_map_and_reduce(x, y, number_of_splits=2)
     actual_result = np.squeeze(np.asarray(whole_dot)).tolist()
     assert actual_result == expected_result
 
