@@ -5,14 +5,14 @@
 ```
 git clone https://github.com/yaseralnajjar/distributed-matrix-multiplication
 cd distributed-matrix-multiplication
-python -m venv venv # python3 in linux
-call venv/Scripts/activate # script in linux
+python -m venv venv
+call venv/Scripts/activate # linux: script venv/bin/activate
 pip install -r requirements
 ```
 
 ## Running tests
 
 ```
-call venv/Scripts/activate # script in linux
+call venv/Scripts/activate # linux: script venv/bin/activate
 python tests.py
 ```
