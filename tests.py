@@ -20,11 +20,26 @@ expected_result = [[114, 160, 60, 27],
                    [74, 97, 73, 14],
                    [119, 157, 112, 23]]
 
+working_directory = os.path.dirname(os.path.realpath(__file__))
+
+
+def convert_np_to_list(np_matrix):
+    return np.squeeze(np.asarray(np_matrix)).tolist()
+
 
 def test(function):
     if __name__ == '__main__':
-        function()
-        print('----------', function.__name__, 'passed')
+        tests_to_run = [
+            # 'test_large_matrix_with_splits_by_three',
+            # 'test_large_matrix_map_and_reduce_by_three',
+        ]
+        if tests_to_run:
+            if function.__name__ in tests_to_run:
+                function()
+                print('----------', function.__name__, 'passed')
+        else:
+            function()
+            print('----------', function.__name__, 'passed')
 
 
 @test
@@ -34,7 +49,7 @@ def test_numpy_dot():
     y_matrix = np.matrix(y)
     matrix_dot = x_matrix * y_matrix
 
-    actual_result = np.squeeze(np.asarray(matrix_dot)).tolist()
+    actual_result = convert_np_to_list(matrix_dot)
     assert actual_result == expected_result
 
 
@@ -56,7 +71,7 @@ def test_dot_matrix_with_splits_by_three():
     dots = list(dots_generator)
     whole_dot = np.concatenate(dots)
 
-    actual_result = np.squeeze(np.asarray(whole_dot)).tolist()
+    actual_result = convert_np_to_list(whole_dot)
     assert actual_result == expected_result
 
 
@@ -71,7 +86,6 @@ def recreate_dirs(folders):
         os.rmdir(directory)
 
     for folder in folders:
-        working_directory = os.path.dirname(os.path.realpath(__file__))
         folder_to_recreate = os.path.join(working_directory, folder)
         try:
             rmtree(folder_to_recreate)
@@ -87,7 +101,7 @@ def test_dot_matrix_map_and_reduce_by_two():
     recreate_dirs(['host0', 'host1', 'reduced'])
 
     whole_dot = dot_matrix_map_and_reduce(x, y, number_of_splits=2)
-    actual_result = np.squeeze(np.asarray(whole_dot)).tolist()
+    actual_result = convert_np_to_list(whole_dot)
     assert actual_result == expected_result
 
 
@@ -97,8 +111,60 @@ def test_dot_matrix_map_and_reduce_by_three():
     recreate_dirs(['host0', 'host1', 'host2', 'reduced'])
 
     whole_dot = dot_matrix_map_and_reduce(x, y, number_of_splits=3)
-    actual_result = np.squeeze(np.asarray(whole_dot)).tolist()
+    actual_result = convert_np_to_list(whole_dot)
     assert actual_result == expected_result
+
+
+large_x = convert_np_to_list(np.loadtxt(os.path.join(working_directory, 'large_matrix_x.txt')))
+large_y = convert_np_to_list(np.loadtxt(os.path.join(working_directory, 'large_matrix_y.txt')))
+large_x_dot_y_expected_result = convert_np_to_list(np.loadtxt(
+    os.path.join(working_directory, 'large_matrix_result.txt')))
+
+
+@test
+@timer('    Took: ', precision=9)
+def test_large_matrix_with_splits_by_three():
+    dots_generator = dot_matrix_with_splits(large_x, large_y, number_of_splits=3)
+    dots = list(dots_generator)
+    whole_dot = np.concatenate(dots)
+    actual_result = convert_np_to_list(whole_dot)
+
+    assert actual_result == large_x_dot_y_expected_result
+
+    # for i, row in enumerate(actual_result):
+    #    print(row)
+    #    print('qoooooooooq')
+    #    print(large_x_dot_y_expected_result[i])
+    #    assert row == large_x_dot_y_expected_result[i]
+#
+    #    for j, inner_row in enumerate(row):
+    #        pass
+#
+    #    print('------------------')
+
+
+@test
+@timer('    Took: ', precision=9)
+def test_large_matrix_map_and_reduce_by_three():
+    recreate_dirs(['host0', 'host1', 'host2', 'reduced'])
+
+    # whole_dot = dot_matrix_map(large_x, large_y, number_of_splits=2)
+    # actual_result = np.squeeze(np.asarray(np.concatenate(list(whole_dot)))).tolist()
+    whole_dot = dot_matrix_map_and_reduce(large_x, large_y, number_of_splits=3)
+    actual_result = convert_np_to_list(whole_dot)
+
+    assert actual_result == large_x_dot_y_expected_result
+
+    # for i, row in enumerate(actual_result):
+    #    print(row)
+    #    print('qoooooooooq')
+    #    print(large_x_dot_y_expected_result[i])
+    #    assert row == large_x_dot_y_expected_result[i]
+#
+    #    for j, inner_row in enumerate(row):
+    #        pass
+#
+    #    print('------------------')
 
 
 if __name__ == '__main__':
