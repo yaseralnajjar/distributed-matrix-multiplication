@@ -1,4 +1,5 @@
 import os
+from math import ceil
 from multiprocessing import Process
 import numpy as np
 
@@ -21,11 +22,7 @@ def dot_matrix_with_splits(x, y, number_of_splits):
     1x4 concatenates 2x4 = 3x4
     """
 
-    if number_of_splits == len(x):
-        chunk_size = 1
-    else:
-        chunk_size = number_of_splits % len(x)
-
+    chunk_size = ceil(len(x) / number_of_splits)
     sub_matrixes = chunks(x, chunk_size)
 
     y_matrix = np.matrix(y)
@@ -43,10 +40,7 @@ def map_to_file(sub_matrix, y_matrix, host_number):
 
 def dot_matrix_map(x, y, number_of_splits):
     y_matrix = np.matrix(y)
-    if number_of_splits == len(x):
-        chunk_size = 1
-    else:
-        chunk_size = number_of_splits % len(x)
+    chunk_size = ceil(len(x) / number_of_splits)
     sub_matrixes = chunks(x, chunk_size)
 
     processes = []
@@ -77,11 +71,11 @@ def dot_matrix_reduce(x, y, number_of_splits):
             mapped_file = os.path.join(working_directory, f'host{host_number}', 'result.npy')
             matrixes.append(np.load(mapped_file))
 
-        reduced_file = os.path.join(working_directory, f'reduced', 'result')
+        reduced_file = os.path.join(working_directory, 'reduced', 'result')
         np.save(reduced_file, np.concatenate(matrixes))
 
     reduce_result(number_of_splits)
-    reduced_result_file = os.path.join(working_directory, f'reduced', 'result.npy')
+    reduced_result_file = os.path.join(working_directory, 'reduced', 'result.npy')
 
     return reduced_result_file
 
