@@ -16,3 +16,10 @@ pip install -r requirements
 call venv/Scripts/activate # linux: script venv/bin/activate
 python tests.py
 ```
+
+## Generate Large Matrix
+
+```
+call venv/Scripts/activate # linux: script venv/bin/activate
+python generate_large_matrix.py
+```
